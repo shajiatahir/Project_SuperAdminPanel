@@ -1,26 +1,16 @@
-const crypto = require('crypto');
-
-exports.generatePassword = () => {
+const generatePassword = () => {
     const length = 12;
-    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    const numbers = '0123456789';
-    const special = '!@#$%^&*()_+';
-    const charset = uppercase + lowercase + numbers + special;
-    
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
     let password = '';
     
-    // Ensure at least one of each required character type
-    password += uppercase[crypto.randomInt(uppercase.length)];
-    password += lowercase[crypto.randomInt(lowercase.length)];
-    password += numbers[crypto.randomInt(numbers.length)];
-    password += special[crypto.randomInt(special.length)];
-    
-    // Fill the rest with random characters
-    while (password.length < length) {
-        password += charset[crypto.randomInt(charset.length)];
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
     }
     
-    // Shuffle the password
-    return password.split('').sort(() => 0.5 - Math.random()).join('');
+    return password;
+};
+
+module.exports = {
+    generatePassword
 }; 

@@ -1,35 +1,39 @@
 const Joi = require('joi');
 
-exports.validateAdminData = (data) => {
+const validateAdminCreation = (data) => {
     const schema = Joi.object({
-        email: Joi.string()
-            .email()
-            .required()
-            .messages({
-                'string.email': 'Please provide a valid email address',
-                'any.required': 'Email is required'
-            }),
-        firstName: Joi.string()
-            .required()
-            .trim()
-            .min(2)
-            .max(50)
-            .messages({
-                'string.min': 'First name must be at least 2 characters long',
-                'string.max': 'First name cannot exceed 50 characters',
-                'any.required': 'First name is required'
-            }),
-        lastName: Joi.string()
-            .required()
-            .trim()
-            .min(2)
-            .max(50)
-            .messages({
-                'string.min': 'Last name must be at least 2 characters long',
-                'string.max': 'Last name cannot exceed 50 characters',
-                'any.required': 'Last name is required'
-            })
+        name: Joi.string().required().min(3).max(50),
+        email: Joi.string().required().email(),
     });
 
     return schema.validate(data);
+};
+
+const validateDateRange = (data) => {
+    const schema = Joi.object({
+        startDate: Joi.date().required(),
+        endDate: Joi.date().min(Joi.ref('startDate')).required()
+    });
+
+    return schema.validate(data);
+};
+
+const validatePromotion = (data) => {
+    const schema = Joi.object({
+        code: Joi.string().required().min(3).max(20),
+        description: Joi.string().required(),
+        discountType: Joi.string().valid('percentage', 'fixed').required(),
+        discountValue: Joi.number().required().positive(),
+        validFrom: Joi.date().required(),
+        validUntil: Joi.date().greater(Joi.ref('validFrom')).required(),
+        maxUses: Joi.number().integer().min(1).allow(null)
+    });
+
+    return schema.validate(data);
+};
+
+module.exports = {
+    validateAdminCreation,
+    validateDateRange,
+    validatePromotion
 }; 
