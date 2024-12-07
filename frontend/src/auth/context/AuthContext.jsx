@@ -57,7 +57,9 @@ export const AuthProvider = ({ children }) => {
 
             setUser(user);
 
-            if (user.roles?.includes('instructor')) {
+            if (user.roles?.includes('superadmin')) {
+                navigate('/super-admin');
+            } else if (user.roles?.includes('instructor')) {
                 navigate('/instructor');
             } else {
                 navigate('/dashboard');

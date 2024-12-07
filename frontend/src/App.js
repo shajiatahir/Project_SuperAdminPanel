@@ -33,6 +33,10 @@ import QuizDetail from './modules/studentDashboard/components/QuizDetail';
 // Chatbot Components
 import ChatbotRoutes from './modules/chatbot/routes/ChatbotRoutes';
 
+// SuperAdmin Components
+import SuperAdminRoute from './auth/components/SuperAdminRoute';
+import SuperAdminRoutes from './modules/superAdmin/routes/SuperAdminRoutes';
+
 // Redirect based on user role
 const RoleBasedRedirect = () => {
     const { user } = useAuth();
@@ -89,6 +93,11 @@ function App() {
                             </Route>
                             <Route path="forums/*" element={<StudentForumRoutes />} />
                             <Route path="chatbot/*" element={<ChatbotRoutes />} />
+                        </Route>
+
+                        {/* Protected SuperAdmin routes */}
+                        <Route path="/super-admin/*" element={<SuperAdminRoute />}>
+                            <Route path="*" element={<SuperAdminRoutes />} />
                         </Route>
 
                         {/* Catch-all redirect */}
