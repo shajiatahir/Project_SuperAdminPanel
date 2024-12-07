@@ -245,47 +245,30 @@ class AuthService {
         return user;
     }
 
-    // Login method
+    // Add this new login method
     async login(email, password) {
         try {
-            console.log('Login attempt for email:', email);
-            
             const user = await User.findOne({ email }).select('+password');
             if (!user) {
-                console.log('User not found:', email);
-                throw new Error('Invalid credentials');
+                throw new Error('User not found');
             }
 
-            console.log('User found, checking password...');
-            console.log('User roles:', user.roles);
-            
-            // Use bcrypt.compare directly
-            const isMatch = await bcrypt.compare(password, user.password);
-            console.log('Password match result:', isMatch);
-            
+            const isMatch = await user.comparePassword(password);
             if (!isMatch) {
-                console.log('Password mismatch for user:', email);
-                throw new Error('Invalid credentials');
+                throw new Error('Invalid password');
             }
 
-            // For superadmin, skip verification check
-            if (!user.roles.includes('superadmin') && !user.isVerified) {
-                throw new Error('Please verify your email before logging in');
-            }
-
-            // Remove password from user object
-            user.password = undefined;
-            console.log('Login successful for user:', email);
-            console.log('User details:', {
-                id: user._id,
-                email: user.email,
-                roles: user.roles,
-                isVerified: user.isVerified
-            });
-
-            return { user };
+            // Make sure we return the complete user object
+            return {
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    roles: user.roles
+                }
+            };
         } catch (error) {
-            console.error('Login error:', error);
             throw error;
         }
     }

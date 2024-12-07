@@ -80,13 +80,25 @@ class AuthController {
             });
 
             res.json({
-                user: result.user,
-                accessToken,
-                refreshToken
+                success: true,
+                data: {
+                    token: accessToken,
+                    refreshToken: refreshToken,
+                    user: {
+                        _id: result.user._id,
+                        email: result.user.email,
+                        firstName: result.user.firstName,
+                        lastName: result.user.lastName,
+                        roles: result.user.roles
+                    }
+                }
             });
         } catch (error) {
             console.error('Login error:', error);
-            res.status(401).json({ message: error.message });
+            res.status(401).json({
+                success: false,
+                message: error.message
+            });
         }
     }
 

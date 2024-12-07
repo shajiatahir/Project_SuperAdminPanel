@@ -17,7 +17,8 @@ const dashboardRouter = require('./src/modules/studentDashboard/routes/dashboard
 const { quizRoutes } = require('./src/modules/quizzes');
 const forumRouter = require('./src/modules/discussion/routes/forumRoutes');
 const studentForumRouter = require('./src/modules/discussion/routes/studentForumRoutes');
-const superAdminRouter = require('./src/modules/superAdmin/routes/superAdminRoutes');
+const enrollmentRoutes = require('./src/modules/courses/routes/enrollmentRoutes');
+const chatbotRoutes = require('./src/modules/chatbot/routes/chatbotRoutes');
 
 // Connect to MongoDB
 connectDB();
@@ -51,9 +52,8 @@ app.use('/api/videos', authenticateToken, videoRouter);
 app.use('/api/quizzes', authenticateToken, quizRoutes);
 app.use('/api/courses', authenticateToken, courseRouter);
 app.use('/api/dashboard', authenticateToken, dashboardRouter);
-
-// Super admin routes - protected with both authentication and super admin middleware
-app.use('/api/super-admin', authenticateToken, superAdminRouter);
+app.use('/api/enrollment', enrollmentRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Handle 404s
 app.use((req, res, next) => {
