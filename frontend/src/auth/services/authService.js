@@ -8,35 +8,21 @@ const authService = {
             const response = await axios.post(`${API_URL}/auth/login`, credentials);
             console.log('Auth service response:', response.data);
 
-            // The backend returns { user, accessToken, refreshToken }
-            const { user, accessToken, refreshToken } = response.data;
+            if (!response.data || !response.data.success) {
+                throw new Error(response.data?.message || 'Login failed');
+            }
 
-            if (!user || !accessToken || !refreshToken) {
+            if (!response.data.data?.token || !response.data.data?.user) {
                 throw new Error('Invalid response from server');
             }
 
-            return {
-                success: true,
-                data: {
-                    user,
-                    token: accessToken,
-                    refreshToken
-                }
-            };
+            return response.data;
         } catch (error) {
             console.error('Auth service error:', error);
             throw new Error(error.response?.data?.message || 'Failed to login');
         }
     },
 
-    register: async (userData) => {
-        try {
-            const response = await axios.post(`${API_URL}/auth/register`, userData);
-            return response.data;
-        } catch (error) {
-            throw new Error(error.response?.data?.message || 'Failed to register');
-        }
-    },
     register: async (userData) => {
         try {
             const response = await axios.post(`${API_URL}/auth/register`, userData);

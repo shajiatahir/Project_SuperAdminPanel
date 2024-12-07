@@ -22,14 +22,15 @@ export const AuthProvider = ({ children }) => {
             const storedToken = localStorage.getItem('token');
             
             if (storedUser && storedToken) {
-                const parsedUser = JSON.parse(storedUser);
-                setUser(parsedUser);
+                setUser(JSON.parse(storedUser));
+            } else {
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
             }
         } catch (error) {
             console.error('Error loading stored user:', error);
             localStorage.removeItem('user');
             localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
         } finally {
             setLoading(false);
         }
@@ -56,13 +57,7 @@ export const AuthProvider = ({ children }) => {
 
             setUser(user);
 
-            // Handle role-based navigation
-            if (user.roles.includes('superadmin')) {
-                console.log('Redirecting to super admin dashboard');
-                navigate('/super-admin');
-            } else if (user.roles.includes('admin')) {
-                navigate('/admin');
-            } else if (user.roles.includes('instructor')) {
+            if (user.roles?.includes('instructor')) {
                 navigate('/instructor');
             } else {
                 navigate('/dashboard');
@@ -76,7 +71,6 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
         setUser(null);
         navigate('/login');
     };
