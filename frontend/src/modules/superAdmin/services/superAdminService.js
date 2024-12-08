@@ -3,13 +3,17 @@ import config from '../../../config';
 
 class SuperAdminService {
     constructor() {
+                // Log initialization of the service
+
         console.log('Initializing SuperAdminService');
         console.log('API URL:', `${config.apiUrl}/super-admin`);
-        
+                // Set up Axios instance with base URL and default configurations
+
         this.api = axios.create({
             baseURL: `${config.apiUrl}/super-admin`,
             withCredentials: true
         });
+        // Request interceptor to log outgoing requests and add authorization token
 
         this.api.interceptors.request.use((config) => {
             console.log('Making request:', {
@@ -18,7 +22,8 @@ class SuperAdminService {
                 data: config.data,
                 headers: config.headers
             });
-            
+                        // Attach authorization token from localStorage
+
             const token = localStorage.getItem('token');
             if (token) {
                 config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
@@ -41,7 +46,8 @@ class SuperAdminService {
                     status: error.response?.status,
                     config: error.config
                 });
-                
+    // Handle unauthorized errors by clearing local storage and redirecting to login
+
                 if (error.response?.status === 401) {
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
