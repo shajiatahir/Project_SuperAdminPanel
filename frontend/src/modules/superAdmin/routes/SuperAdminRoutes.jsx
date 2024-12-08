@@ -5,6 +5,8 @@ import AdminManagement from '../components/AdminManagement';
 import PaymentManagement from '../components/PaymentManagement';
 import SubscriptionManagement from '../components/SubscriptionManagement';
 import PromotionManagement from '../components/PromotionManagement';
+import AnalyticsDashboard from '../components/AnalyticsDashboard';
+import ContentApprovalDashboard from '../components/ContentApprovalDashboard';
 import SuperAdminLayout from '../components/SuperAdminLayout';
 
 const SuperAdminRoutes = () => {
@@ -12,6 +14,8 @@ const SuperAdminRoutes = () => {
         <Routes>
             <Route element={<SuperAdminLayout />}>
                 <Route index element={<SuperAdminDashboard />} />
+                <Route path="analytics" element={<AnalyticsDashboard />} />
+                <Route path="content-approvals" element={<ContentApprovalDashboard />} />
                 <Route path="admins" element={<AdminManagement />} />
                 <Route path="payments" element={<PaymentManagement />} />
                 <Route path="subscriptions" element={<SubscriptionManagement />} />

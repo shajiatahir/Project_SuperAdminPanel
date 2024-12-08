@@ -5,12 +5,16 @@ import {
     FaMoneyBillWave, 
     FaTicketAlt, 
     FaChartLine,
-    FaTags 
+    FaTags,
+    FaChartBar,
+    FaClipboardCheck 
 } from 'react-icons/fa';
 
 const SuperAdminSidebar = () => {
     const navItems = [
         { path: '/super-admin', icon: FaChartLine, label: 'Dashboard' },
+        { path: '/super-admin/analytics', icon: FaChartBar, label: 'Analytics' },
+        { path: '/super-admin/content-approvals', icon: FaClipboardCheck, label: 'Content Approvals' },
         { path: '/super-admin/admins', icon: FaUsers, label: 'Admin Management' },
         { path: '/super-admin/payments', icon: FaMoneyBillWave, label: 'Payments' },
         { path: '/super-admin/subscriptions', icon: FaTicketAlt, label: 'Subscriptions' },
@@ -18,7 +22,7 @@ const SuperAdminSidebar = () => {
     ];
 
     return (
-        <aside className="w-64 min-h-screen bg-white shadow-md">
+        <aside className="w-64 min-h-screen bg-white/[0.02] backdrop-blur-xl border-r border-white/10">
             <nav className="mt-8">
                 <div className="px-4">
                     {navItems.map((item) => (
@@ -28,8 +32,8 @@ const SuperAdminSidebar = () => {
                             className={({ isActive }) =>
                                 `flex items-center px-4 py-3 mb-2 rounded-lg transition-colors duration-200 ${
                                     isActive
-                                        ? 'bg-purple-100 text-purple-600'
-                                        : 'text-gray-600 hover:bg-gray-100'
+                                        ? 'bg-yellow-400/10 text-yellow-400'
+                                        : 'text-white/60 hover:bg-white/5 hover:text-white'
                                 }`
                             }
                         >
