@@ -1,81 +1,49 @@
 const Payment = require('../models/paymentModel');
-const Subscription = require('../models/subscriptionModel');
-const Promotion = require('../models/promotionModel');
 
 class PaymentService {
     async createPayment(paymentData) {
         try {
-            const payment = await Payment.create(paymentData);
-            return payment;
+            const payment = new Payment(paymentData);
+            return await payment.save();
         } catch (error) {
-            throw new Error(`Error creating payment: ${error.message}`);
+            console.error('Create payment error:', error);
+            throw error;
         }
     }
 
-    async getPaymentsByDateRange(startDate, endDate) {
+    async getAllPayments() {
         try {
-            const payments = await Payment.find({
-                paymentDate: {
-                    $gte: startDate,
-                    $lte: endDate
-                }
-            }).populate('userId subscriptionId');
-            return payments;
+            return await Payment.find()
+                .populate('userId', 'firstName lastName email')
+                .populate('subscriptionId', 'name price')
+                .sort({ paymentDate: -1 });
         } catch (error) {
-            throw new Error(`Error fetching payments: ${error.message}`);
+            console.error('Get payments error:', error);
+            throw error;
         }
     }
 
-    async generateFinancialReport(startDate, endDate) {
+    async getPaymentById(id) {
         try {
-            const payments = await Payment.find({
-                paymentDate: { $gte: startDate, $lte: endDate },
-                status: 'completed'
-            });
-
-            const report = {
-                totalRevenue: 0,
-                totalTransactions: payments.length,
-                averageTransactionValue: 0,
-                paymentMethods: {}
-            };
-
-            payments.forEach(payment => {
-                report.totalRevenue += payment.amount;
-                report.paymentMethods[payment.paymentMethod] = 
-                    (report.paymentMethods[payment.paymentMethod] || 0) + 1;
-            });
-
-            report.averageTransactionValue = 
-                report.totalTransactions > 0 ? 
-                report.totalRevenue / report.totalTransactions : 0;
-
-            return report;
+            return await Payment.findById(id)
+                .populate('userId', 'firstName lastName email')
+                .populate('subscriptionId', 'name price');
         } catch (error) {
-            throw new Error(`Error generating report: ${error.message}`);
+            console.error('Get payment error:', error);
+            throw error;
         }
     }
 
-    async validatePromoCode(code) {
+    async updatePaymentStatus(id, status) {
         try {
-            const promotion = await Promotion.findOne({
-                code,
-                isActive: true,
-                validFrom: { $lte: new Date() },
-                validUntil: { $gte: new Date() },
-                $or: [
-                    { maxUses: null },
-                    { currentUses: { $lt: '$maxUses' } }
-                ]
-            });
-
-            if (!promotion) {
-                throw new Error('Invalid or expired promotion code');
-            }
-
-            return promotion;
+            return await Payment.findByIdAndUpdate(
+                id,
+                { status },
+                { new: true }
+            );
         } catch (error) {
-            throw new Error(`Error validating promotion: ${error.message}`);
+            console.error('Update payment status error:', error);
+            throw error;
         }
     }
 }
