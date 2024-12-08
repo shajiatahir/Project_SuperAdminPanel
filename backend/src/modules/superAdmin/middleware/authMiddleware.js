@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const SuperAdmin = require('../models/superAdminModel');
+const User = require('../../auth/models/userModel');
 
 const authenticateSuperAdmin = async (req, res, next) => {
     try {
@@ -13,25 +13,24 @@ const authenticateSuperAdmin = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const superAdmin = await SuperAdmin.findById(decoded.id);
+        const user = await User.findById(decoded.userId || decoded.id);
 
-        if (!superAdmin || superAdmin.role !== 'superadmin') {
+        if (!user || !user.roles.includes('superadmin')) {
             return res.status(403).json({
                 success: false,
                 message: 'Not authorized as Super Admin'
             });
         }
 
-        req.user = superAdmin;
+        req.user = user;
         next();
     } catch (error) {
+        console.error('Auth middleware error:', error);
         res.status(401).json({
             success: false,
-            message: 'Invalid authentication token'
+            message: 'Invalid or expired token'
         });
     }
 };
 
-module.exports = {
-    authenticateSuperAdmin
-}; 
+module.exports = { authenticateSuperAdmin }; 

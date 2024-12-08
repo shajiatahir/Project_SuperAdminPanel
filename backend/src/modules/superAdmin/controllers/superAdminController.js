@@ -1,59 +1,62 @@
-const SuperAdminService = require('../services/superAdminService');
-const { validateAdminCreation } = require('../utils/validationUtils');
+const User = require('../../auth/models/userModel');
 
 class SuperAdminController {
     async createAdmin(req, res) {
         try {
-            const { error } = validateAdminCreation(req.body);
-            if (error) {
-                return res.status(400).json({ error: error.details[0].message });
-            }
+            const { firstName, lastName, email, password } = req.body;
+            console.log('Creating new admin:', { firstName, lastName, email });
 
-            const admin = await SuperAdminService.createAdmin(req.body, req.user.id);
-            
+            // Create user using the User model
+            const user = new User({
+                firstName,
+                lastName,
+                email,
+                password, // Will be hashed by User model's pre-save middleware
+                roles: ['superadmin'],
+                isVerified: true
+            });
+
+            const savedUser = await user.save();
+            console.log('Admin created successfully:', savedUser._id);
+
             res.status(201).json({
                 success: true,
                 message: 'Admin created successfully',
                 data: {
-                    id: admin._id,
-                    name: admin.name,
-                    email: admin.email
+                    _id: savedUser._id,
+                    firstName: savedUser.firstName,
+                    lastName: savedUser.lastName,
+                    email: savedUser.email,
+                    roles: savedUser.roles
                 }
             });
         } catch (error) {
+            console.error('Create admin error:', error);
             res.status(500).json({
                 success: false,
-                message: error.message
+                message: error.message || 'Failed to create admin'
             });
         }
     }
 
-    async getAllAdmins(req, res) {
+    async getAllUsers(req, res) {
         try {
-            const admins = await SuperAdminService.getAllAdmins();
-            res.status(200).json({
-                success: true,
-                data: admins
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message
-            });
-        }
-    }
+            // Get all users from the database
+            const users = await User.find()
+                .select('firstName lastName email roles createdAt')
+                .sort({ createdAt: -1 });
 
-    async deleteAdmin(req, res) {
-        try {
-            await SuperAdminService.deleteAdmin(req.params.id);
-            res.status(200).json({
+            console.log(`Found ${users.length} users`);
+
+            res.json({
                 success: true,
-                message: 'Admin deactivated successfully'
+                data: users
             });
         } catch (error) {
+            console.error('Get users error:', error);
             res.status(500).json({
                 success: false,
-                message: error.message
+                message: 'Failed to fetch users'
             });
         }
     }

@@ -4,33 +4,22 @@ const bcrypt = require('bcryptjs');
 const adminSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        trim: true
+        required: true
     },
     email: {
         type: String,
         required: true,
-        unique: true,
-        trim: true,
-        lowercase: true
+        unique: true
     },
     password: {
         type: String,
         required: true
     },
-    role: {
+    roles: [{
         type: String,
-        default: 'admin'
-    },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'SuperAdmin',
-        required: true
-    },
-    isActive: {
-        type: Boolean,
-        default: true
-    },
+        enum: ['admin', 'super_admin'],
+        default: ['super_admin']
+    }],
     createdAt: {
         type: Date,
         default: Date.now
@@ -40,8 +29,14 @@ const adminSchema = new mongoose.Schema({
 // Hash password before saving
 adminSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 12);
-    next();
+    
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 const Admin = mongoose.model('Admin', adminSchema);
