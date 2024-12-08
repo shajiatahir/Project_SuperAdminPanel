@@ -17,7 +17,7 @@ const ContentApprovalDashboard = () => {
             course: 'Advanced React Development',
             duration: '45 minutes',
             submittedAt: '2023-12-20T10:30:00',
-            thumbnailUrl: 'https://placehold.co/600x400',
+            thumbnailUrl: '/images/content-thumbnails/reactlearn.jpg',
             videoUrl: 'https://example.com/video1.mp4',
             status: 'pending'
         },
@@ -34,7 +34,7 @@ const ContentApprovalDashboard = () => {
             course: 'Backend Development',
             duration: '55 minutes',
             submittedAt: '2023-12-19T15:45:00',
-            thumbnailUrl: 'https://placehold.co/600x400',
+            thumbnailUrl: '/images/content-thumbnails/nodejs.jpg',
             videoUrl: 'https://example.com/video2.mp4',
             status: 'pending'
         },
@@ -51,7 +51,7 @@ const ContentApprovalDashboard = () => {
             course: 'Database Management',
             duration: '35 minutes',
             submittedAt: '2023-12-18T09:15:00',
-            thumbnailUrl: 'https://placehold.co/600x400',
+            thumbnailUrl: '/images/content-thumbnails/db.jpg',
             videoUrl: 'https://example.com/video3.mp4',
             status: 'pending'
         },
@@ -68,7 +68,7 @@ const ContentApprovalDashboard = () => {
             course: 'Frontend Development',
             duration: '50 minutes',
             submittedAt: '2023-12-17T14:20:00',
-            thumbnailUrl: 'https://placehold.co/600x400',
+            thumbnailUrl: '/images/content-thumbnails/css.jpg',
             videoUrl: 'https://example.com/video4.mp4',
             status: 'pending'
         }
@@ -99,29 +99,11 @@ const ContentApprovalDashboard = () => {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'approved':
-                return (
-                    <span className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-sm">
-                        Approved
-                    </span>
-                );
+                return <span className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-sm">Approved</span>;
             case 'rejected':
-                return (
-                    <span className="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-sm">
-                        Rejected
-                    </span>
-                );
+                return <span className="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-sm">Rejected</span>;
             default:
-                return (
-                    <span className="px-3 py-1 bg-yellow-400/10 text-yellow-400 rounded-full text-sm">
-                        Pending Review
-                    </span>
-                );
-        }
-    };
-
-    const handleCloseModal = (e) => {
-        if (e.target === e.currentTarget) {
-            setSelectedContent(null);
+                return <span className="px-3 py-1 bg-yellow-400/10 text-yellow-400 rounded-full text-sm">Pending Review</span>;
         }
     };
 
@@ -134,144 +116,188 @@ const ContentApprovalDashboard = () => {
                     {requests.map((request) => (
                         <div 
                             key={request.id}
-                            className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 hover:bg-white/[0.15] transition-all duration-300"
+                            className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+                            onClick={() => setSelectedContent(request)}
                         >
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-start space-x-4">
+                            <div className="flex gap-6">
+                                {/* Thumbnail Preview */}
+                                <div className="w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
                                     <img 
-                                        src={request.instructor.avatar} 
-                                        alt={request.instructor.name}
-                                        className="w-12 h-12 rounded-full border-2 border-yellow-400/20"
+                                        src={request.thumbnailUrl}
+                                        alt={request.title}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = '/images/placeholder.jpg';
+                                        }}
                                     />
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-white">{request.title}</h3>
-                                        <div className="flex items-center text-white/60 text-sm space-x-4 mt-1">
-                                            <span className="flex items-center">
-                                                <FaUser className="mr-1" />
-                                                {request.instructor.name}
-                                            </span>
-                                            <span className="flex items-center">
-                                                <FaVideo className="mr-1" />
-                                                {request.duration}
-                                            </span>
-                                            <span className="flex items-center">
-                                                <FaClock className="mr-1" />
-                                                {formatDate(request.submittedAt)}
-                                            </span>
-                                        </div>
-                                        <p className="text-white/80 mt-2 line-clamp-2">{request.description}</p>
-                                    </div>
                                 </div>
 
-                                {getStatusBadge(request.status)}
-                            </div>
-
-                            <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/10">
-                                <button
-                                    onClick={() => setSelectedContent(request)}
-                                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors flex items-center"
-                                >
-                                    <FaEye className="mr-2" />
-                                    View Details
-                                </button>
-                                {request.status === 'pending' && (
-                                    <div className="flex space-x-3">
-                                        <button
-                                            onClick={() => handleApprove(request.id)}
-                                            className="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors flex items-center"
-                                        >
-                                            <FaCheck className="mr-2" />
-                                            Approve
-                                        </button>
-                                        <button
-                                            onClick={() => handleReject(request.id)}
-                                            className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors flex items-center"
-                                        >
-                                            <FaTimes className="mr-2" />
-                                            Reject
-                                        </button>
+                                {/* Content Details */}
+                                <div className="flex-1">
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-white">{request.title}</h3>
+                                            <div className="flex items-center text-white/60 text-sm space-x-4 mt-1">
+                                                <span className="flex items-center">
+                                                    <FaUser className="mr-1" />
+                                                    {request.instructor.name}
+                                                </span>
+                                                <span className="flex items-center">
+                                                    <FaVideo className="mr-1" />
+                                                    {request.duration}
+                                                </span>
+                                                <span className="flex items-center">
+                                                    <FaClock className="mr-1" />
+                                                    {formatDate(request.submittedAt)}
+                                                </span>
+                                            </div>
+                                            <p className="text-white/80 mt-2 line-clamp-2">{request.description}</p>
+                                        </div>
+                                        {getStatusBadge(request.status)}
                                     </div>
-                                )}
+
+                                    {request.status === 'pending' && (
+                                        <div className="flex justify-end space-x-3 mt-4">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleApprove(request.id);
+                                                }}
+                                                className="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors flex items-center"
+                                            >
+                                                <FaCheck className="mr-2" />
+                                                Approve
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleReject(request.id);
+                                                }}
+                                                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors flex items-center"
+                                            >
+                                                <FaTimes className="mr-2" />
+                                                Reject
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Modal with improved closing behavior */}
+            {/* Preview Modal */}
             {selectedContent && (
                 <div 
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
-                    onClick={handleCloseModal}
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+                    onClick={() => setSelectedContent(null)}
                 >
                     <div 
-                        className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6 max-w-2xl w-full m-auto"
+                        className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6 max-w-3xl w-full"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-xl font-bold text-white">{selectedContent.title}</h2>
+                        {/* Header with close button */}
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-white">Content Review</h2>
                             <button 
                                 onClick={() => setSelectedContent(null)}
-                                className="text-white/60 hover:text-white transition-colors p-2"
+                                className="text-white/60 hover:text-white text-xl"
                             >
                                 ✕
                             </button>
                         </div>
-                        
-                        <div className="space-y-4">
-                            <img 
-                                src={selectedContent.thumbnailUrl} 
-                                alt={selectedContent.title}
-                                className="w-full rounded-lg"
-                            />
-                            
-                            <div className="bg-white/5 rounded-lg p-4">
-                                <h3 className="text-white font-semibold mb-2">Instructor Details</h3>
-                                <div className="flex items-center space-x-3">
+
+                        <div className="flex gap-6">
+                            {/* Left side - Image */}
+                            <div className="w-1/3 flex-shrink-0">
+                                <div className="rounded-lg overflow-hidden">
                                     <img 
-                                        src={selectedContent.instructor.avatar}
-                                        alt={selectedContent.instructor.name}
-                                        className="w-10 h-10 rounded-full"
+                                        src={selectedContent.thumbnailUrl}
+                                        alt={selectedContent.title}
+                                        className="w-full h-auto object-cover"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = '/images/placeholder.jpg';
+                                        }}
                                     />
-                                    <div>
-                                        <p className="text-white">{selectedContent.instructor.name}</p>
-                                        <p className="text-white/60 text-sm">{selectedContent.instructor.email}</p>
+                                </div>
+                            </div>
+
+                            {/* Right side - Content Details */}
+                            <div className="flex-1 space-y-4">
+                                {/* Title and Status */}
+                                <div className="flex justify-between items-start">
+                                    <h3 className="text-lg font-semibold text-white">{selectedContent.title}</h3>
+                                    {getStatusBadge(selectedContent.status)}
+                                </div>
+
+                                {/* Instructor Info */}
+                                <div className="bg-white/5 rounded-lg p-4">
+                                    <h4 className="text-white/80 text-sm font-semibold mb-2">Instructor</h4>
+                                    <div className="flex items-center gap-3">
+                                        <img 
+                                            src={selectedContent.instructor.avatar} 
+                                            alt={selectedContent.instructor.name}
+                                            className="w-10 h-10 rounded-full"
+                                        />
+                                        <div>
+                                            <p className="text-white font-medium">{selectedContent.instructor.name}</p>
+                                            <p className="text-white/60 text-sm">{selectedContent.instructor.email}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div>
-                                <h3 className="text-white font-semibold mb-2">Description</h3>
-                                <p className="text-white/80">{selectedContent.description}</p>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
+                                {/* Course Info */}
                                 <div className="bg-white/5 rounded-lg p-4">
-                                    <h4 className="text-white/60 text-sm">Course</h4>
-                                    <p className="text-white">{selectedContent.course}</p>
+                                    <h4 className="text-white/80 text-sm font-semibold mb-2">Course Details</h4>
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <p className="text-white/60">Course</p>
+                                            <p className="text-white">{selectedContent.course}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-white/60">Duration</p>
+                                            <p className="text-white">{selectedContent.duration}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-white/60">Submitted</p>
+                                            <p className="text-white">{formatDate(selectedContent.submittedAt)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-white/60">Content Type</p>
+                                            <p className="text-white capitalize">{selectedContent.type}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="bg-white/5 rounded-lg p-4">
-                                    <h4 className="text-white/60 text-sm">Duration</h4>
-                                    <p className="text-white">{selectedContent.duration}</p>
-                                </div>
-                            </div>
 
-                            {selectedContent.status === 'pending' && (
-                                <div className="flex justify-end space-x-3 mt-6">
-                                    <button
-                                        onClick={() => handleApprove(selectedContent.id)}
-                                        className="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors"
-                                    >
-                                        Approve Content
-                                    </button>
-                                    <button
-                                        onClick={() => handleReject(selectedContent.id)}
-                                        className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
-                                    >
-                                        Reject Content
-                                    </button>
+                                {/* Description */}
+                                <div className="bg-white/5 rounded-lg p-4">
+                                    <h4 className="text-white/80 text-sm font-semibold mb-2">Description</h4>
+                                    <p className="text-white/80 text-sm">{selectedContent.description}</p>
                                 </div>
-                            )}
+
+                                {/* Action Buttons */}
+                                {selectedContent.status === 'pending' && (
+                                    <div className="flex justify-end gap-3 pt-4">
+                                        <button
+                                            onClick={() => handleApprove(selectedContent.id)}
+                                            className="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors flex items-center"
+                                        >
+                                            <FaCheck className="mr-2" />
+                                            Approve Content
+                                        </button>
+                                        <button
+                                            onClick={() => handleReject(selectedContent.id)}
+                                            className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors flex items-center"
+                                        >
+                                            <FaTimes className="mr-2" />
+                                            Reject Content
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
